@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+
+    <context:component-scan base-package="com.smbms.service"/>
+
+<!--    <bean id="user" class="com.smbms.pojo.User" scope="prototype"></bean>-->
+
+<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="location" value="classpath:db.properties"></property>
+</bean>
+<!--    配置cp30数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${driver}"></property>
+        <property name="jdbcUrl" value="${url}"></property>
+        <property name="user" value="${username}"></property>
+        <property name="password" value="${password}"></property>
+    </bean>
+<!--    1.2 SqlSessionFactoryBean配置,提供SqlSession对象-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="mapperLocations" value="classpath*:mapper/*Mapper.xml"></property>
+    </bean>
+<!--    1.3 SqlSessionTemplate负责管理SqlSession-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sessionFactory"></constructor-arg>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.smbms.mapper"></property>
+    </bean>
+
+    <!-- 1. 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!--<tx:advice>元素声明事务通知-->
+<!--    <tx:advice id="txAdvice" transaction-manager="transactionManager">-->
+<!--        <tx:attributes>-->
+<!--            <tx:method name="*"/>-->
+<!--            <tx:method name="purchase" propagation="REQUIRES_NEW"/>-->
+<!--            &lt;!&ndash;isolation配置事务的隔离级别&ndash;&gt;-->
+<!--            <tx:method name="modify*" isolation="SERIALIZABLE"/>-->
+<!--            <tx:method name="add*" no-rollback-for="com.dmsd.spring.tx.BookStockException"/>-->
+<!--            &lt;!&ndash;read-only配置事务只读属性&ndash;&gt;-->
+<!--            <tx:method name="find*" read-only="true"/>-->
+<!--            &lt;!&ndash;timeout配置事务的超时属性&ndash;&gt;-->
+<!--            <tx:method name="get*" timeout="3"/>-->
+
+<!--        </tx:attributes>-->
+<!--        &lt;!&ndash; 3. 配置事务切入点, 以及把事务切入点和事务属性关联起来 &ndash;&gt;-->
+<!--    </tx:advice>-->
+    <aop:config>
+        <aop:pointcut expression="execution(* com.smbms.service.*.*(..))" id="txPointCut" />
+<!--        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>-->
+    </aop:config>
+
+</beans>

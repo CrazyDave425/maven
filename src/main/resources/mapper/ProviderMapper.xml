@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smbms.mapper.ProviderMapper">
+    <select id="getAllProvider" resultType="com.smbms.pojo.Provider" >
+        select * from smbms_provider
+    </select>
+    <select id="getByid" resultType="com.smbms.pojo.Provider">
+        select * from smbms_provider where id=#{id}
+    </select>
+    <select id="getByIdAndProName" resultType="com.smbms.pojo.Provider">
+        select * from smbms_provider
+        <where>
+            <if test="id!=null">id=#{id}</if>
+            <if test="proName!=null and proName!=''">and proName like  concat("%",#{proName},"%") </if>
+        </where>
+    </select>
+    <insert id="addProvider">
+        insert into smbms_provider (id,proCode,proName,proDesc,proContact,proPhone,proAddress,proFax,createdBy,creationDate,modifyDate,modifyBy)
+        values (#{id},#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},#{proAddress},#{proFax},#{createdBy},#{creationDate},#{modifyDate},#{modifyBy})
+    </insert>
+    <update id="modify">
+        update smbms_provider
+        <trim prefix="set" suffixOverrides="," suffix=" where id=#{id}">
+            <if test="proCode!=null"> proCode=#{proCode},</if>
+            <if test="proName!=null"> proName=#{proName},</if>
+            <if test="proDesc!=null"> proDesc=#{proDesc},</if>
+            <if test="proContact!=null"> proContact=#{proContact},</if>
+            <if test="proPhone!=null"> proPhone=#{proPhone},</if>
+            <if test="proAddress!=null"> proCode=#{proAddress},</if>
+            <if test="proFax!=null"> proFax=#{proFax},</if>
+            <if test="creationDate!=null">creationDate=#{creationDate} </if>
+        </trim>
+    </update>
+    <delete id="delProvider">
+        delete from smbms_provider where id=#{id}
+    </delete>
+    <select id="getByCreatedBy" resultType="com.smbms.pojo.Provider">
+        select * from smbms_provider
+            <where>
+            <if test="CreatedBys!=null and CreatedBys.size>0">
+                createdBy in
+                <foreach collection="CreatedBys" item="CreatedBys" open="(" close=")" separator=",">
+                    #{CreatedBys}
+                </foreach>
+            </if>
+            </where>
+    </select>
+<!--    分页-->
+    <select id="getPageProvider" resultType="com.smbms.pojo.Provider" >
+        select * from smbms_provider limit #{from},#{pageSize}
+    </select>
+</mapper>

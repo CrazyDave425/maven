@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.smbms.mapper.BillMapper">
+    <select id="getProductNameAndProviderId" resultType="com.smbms.pojo.Bill">
+        SELECT smbms_bill.* ,smbms_provider.proName  FROM smbms_bill ,smbms_provider  WHERE  productName LIKE CONCAT(CONCAT('%',#{name},'%')) AND smbms_bill.id=smbms_provider.id=#{id} AND isPayment=#{isPayment}
+    </select>
+    <select id="getByid" resultType="com.smbms.pojo.Bill">
+        select * from smbms_bill where id=#{id}
+    </select>
+    <insert id="addBill">
+        insert into smbms_bill (id,billCode,productName,productDesc,productUnit,productCount,totalPrice,isPayment,createdBy,creationDate,modifyBy,modifyDate,providerId)
+        values (#{id},#{billCode},#{productName},#{productDesc},#{productUnit},#{productCount},#{totalPrice},#{isPayment},#{createdBy},#{creationDate},#{modifyBy},#{modifyDate},#{providerId})
+    </insert>
+    <update id="modify">
+        update smbms_bill set billCode=#{billCode},productName=#{productName},productDesc=#{productDesc},productUnit=#{productUnit},productCount=#{productCount},totalPrice=#{totalPrice},isPayment=#{isPayment},createdBy=#{createdBy},creationDate=#{creationDate},modifyBy=#{modifyBy},modifyDate=#{modifyDate},providerId=#{providerId}
+            where id=#{id}
+    </update>
+    <delete id="delBill">
+        delete from smbms_bill where id=#{id}
+    </delete>
+</mapper>
